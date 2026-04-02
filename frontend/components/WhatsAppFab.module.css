@@ -1,0 +1,205 @@
+/* root variables moved to styles/globals.css */
+
+.fab {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  width: var(--wa-size);
+  height: var(--wa-size);
+  border-radius: 9999px;
+  display: inline-grid;
+  place-items: center;
+  z-index: 60;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  overflow: visible;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  /* subtle constant float so it reads as hovering */
+  animation: fab-float 6s ease-in-out infinite;
+}
+
+/* when footer is visible we hide the FAB (translate out + fade) */
+.hiddenFooter {
+  transform: translateY(120%) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: transform 320ms cubic-bezier(.22,.7,.35,1), opacity 240ms ease;
+}
+
+/* tooltip bubble shown on hover */
+.tooltip{
+  position: absolute;
+  right: calc(100% + 0.9rem);
+  top: 50%;
+  transform: translateY(-50%) translateX(8px);
+  background: rgba(20,24,31,0.94);
+  color: #f4f7fb;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  box-shadow: 0 8px 22px rgba(2,6,23,0.6), 0 2px 6px rgba(0,0,0,0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 260ms cubic-bezier(.22,.7,.35,1);
+  z-index: 65;
+  border: 1px solid rgba(255,255,255,0.03);
+  white-space: nowrap;
+}
+.tooltipArrow{
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 12px;
+  height: 12px;
+  background: rgba(20,24,31,0.94);
+  border-left: 1px solid rgba(255,255,255,0.02);
+  border-top: 1px solid rgba(255,255,255,0.02);
+  margin-left: -6px;
+}
+.fab:hover .tooltip{ opacity: 1; transform: translateY(-50%) translateX(0); pointer-events: auto; }
+
+/* hide tooltip on small screens to avoid overlap */
+@media (max-width:640px){
+  .tooltip{ display:none; }
+}
+
+/* small brand label that appears on hover (desktop) */
+/* decorative halo + ring to match the reference (soft outer glow + subtle ring) */
+/* outer ambient glow */
+.haloSecondary {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--wa-size) * 1.7);
+  height: calc(var(--wa-size) * 1.7);
+  background: radial-gradient(circle, rgba(37,211,102,0.18) 0%, rgba(37,211,102,0) 70%);
+  filter: blur(6px);
+  z-index: 0;
+  opacity: 1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+/* inner tight glow */
+.haloPrimary{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--wa-size) * 1.12);
+  height: calc(var(--wa-size) * 1.12);
+  background: radial-gradient(circle, rgba(37,211,102,0.28) 0%, rgba(37,211,102,0) 70%);
+  filter: blur(4px);
+  z-index: 1;
+  opacity: 0.9;
+  border-radius: 50%;
+  pointer-events: none;
+}
+/* subtle crisp ring */
+.ring{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--wa-size) * 1.04);
+  height: calc(var(--wa-size) * 1.04);
+  border-radius: 50%;
+  border: 1.5px solid rgba(37,211,102,0.35);
+  z-index: 5;
+  background: transparent;
+  pointer-events: none;
+}
+.shine{ display: none; }
+
+
+/* Visual base */
+.fabInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  background: radial-gradient(ellipse at 50% 35%, #4cd870 0%, #25D366 55%, #1aad60 100%);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.42), inset 0 -4px 10px rgba(0,0,0,0.1), inset 0 2px 6px rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.08);
+}
+
+.icon {
+  width: 62%;
+  height: 62%;
+  display: block;
+  z-index: 6;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.22));
+}
+
+.haloPrimary, .haloSecondary, .ring, .shine {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* decorative halos removed for a flat, brand look */
+
+/* decorative halos removed for a flat, brand look */
+
+/* ring removed for simpler icon silhouette */
+
+/* soft elliptical ground shadow to sell the floating effect */
+.drop{
+  position: absolute;
+  left: 50%;
+  top: calc(50% + var(--wa-size));
+  transform: translate(-50%, 0) scale(1);
+  width: calc(var(--wa-size) * 1.6);
+  height: calc(var(--wa-size) * 0.38);
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.1) 55%, rgba(0,0,0,0) 100%);
+  filter: blur(8px);
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.65;
+  will-change: transform, opacity;
+}
+
+/* Animations - container beat + glow */
+/* Removed pulsing/beat and glow animations - FAB will only float */
+@keyframes wa-halo-fade { 0%{ opacity:.85;} 25%{ opacity:.5;} 45%{ opacity:.25;} 100%{ opacity:0;} }
+@keyframes wa-shine { 0%{ transform: translate(-140%, -60%) rotate(-22deg) scale(.98); opacity:0;} 6%{ transform: translate(-60%, -60%) rotate(-22deg) scale(1); opacity:.45;} 22%{ transform: translate(80%, -60%) rotate(-22deg) scale(1.02); opacity:0;} 100%{ opacity:0;} }
+
+.containerAnim{
+  transform-origin: center center;
+  /* no pulsing: keep will-change/transition for hover/interaction only */
+  will-change: transform, box-shadow;
+  transition: transform 360ms cubic-bezier(.22,.7,.35,1), box-shadow 480ms cubic-bezier(.22,.7,.35,1);
+}
+
+.haloPrimary{ /* static subtle inner glow */ opacity: 0.62; }
+.haloSecondary{ /* static outer glow */ opacity: 0.44; }
+.shine{ display: none; }
+
+/* FAB float animation - gentle vertical movement */
+@keyframes fab-float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+/* shadow responds opposite to the float to feel grounded */
+
+
+/* Hover/active */
+.fab:hover .fabInner{ transform: translateZ(0) scale(1.02); }
+.fab:active .fabInner, .fab:focus .fabInner{ transform: scale(.98); }
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce){
+  .containerAnim, .haloPrimary, .haloSecondary, .shine{ animation: none!important; transition:none!important; }
+}
