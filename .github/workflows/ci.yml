@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          npm ci
+
+      - name: Lint
+        run: |
+          cd backend
+          npm run lint || true
+
+      - name: Run tests
+        run: |
+          cd backend
+          npm test --silent
+
+      - name: Build Docker image and push to GHCR
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/arisrifas:latest
+          cache-from: type=gha
+          platforms: linux/amd64
+        env:
+          # Requires GHCR_PAT or GITHUB_TOKEN with packages:write permission
+          CR_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+# Optional: add a deploy job that runs terraform plan/apply (requires AWS creds)
