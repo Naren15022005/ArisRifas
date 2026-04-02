@@ -58,6 +58,7 @@ export default function PurchaseModal({ raffle, onClose }: { raffle: Raffle | nu
 
   useEffect(() => {
     if (!raffle) return
+    const raffleId = raffle.id
     setQty(1)
     setSelected(new Set())
     setStep('select')
@@ -66,7 +67,7 @@ export default function PurchaseModal({ raffle, onClose }: { raffle: Raffle | nu
     async function loadSoldNumbers() {
       try {
         const base = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001'
-        const res = await fetch(`${base}/api/raffles/${raffle.id}/tickets/all`, {
+        const res = await fetch(`${base}/api/raffles/${raffleId}/tickets/all`, {
           signal: controller.signal,
         })
         if (!res.ok) throw new Error('No se pudo cargar el talonario')
