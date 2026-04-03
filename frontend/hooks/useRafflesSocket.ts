@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+import { getBackendBaseUrl } from '../lib/backend';
+
 type PurchaseEvent = { raffleId: number; purchaseId: number; quantity: number };
 
 type RaffleEvent = any;
@@ -15,7 +17,7 @@ export default function useRafflesSocket(
     async function init() {
       try {
         const { io } = await import('socket.io-client');
-        const base = process.env.NEXT_PUBLIC_API_URL || '';
+        const base = getBackendBaseUrl();
         const url = base.replace(/\/$/, '');
         // connect to namespace /raffles
         const socket = io(url + '/raffles', { transports: ['websocket'] });

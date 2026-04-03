@@ -12,3 +12,5 @@ dist/
 # Allow committed backend dist (prebuilt) despite the general dist/ ignore
 !/backend/dist/
 !/backend/dist/**
+.vercel
+.env*.local

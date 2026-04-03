@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 
+import { getBackendBaseUrl } from '../lib/backend'
+
 export type AdminRaffleTicketsModalProps = {
   raffle: {
     id?: number
@@ -28,9 +30,11 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
       setLoading(true)
       setError(null)
       try {
-        const base = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001')
+        const base = getBackendBaseUrl()
+        const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
         const res = await fetch(`${base}/api/raffles/${raffle.id}/tickets/all`, {
           signal: controller.signal,
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         })
         if (!res.ok) throw new Error('No se pudo cargar el talonario')
         const data = await res.json()
@@ -63,9 +67,11 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
     if (!confirm) return
 
     try {
-      const base = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001')
+      const base = getBackendBaseUrl()
+      const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
       const res = await fetch(`${base}/api/tickets/${ticket.id}/revert-to-available`, {
         method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       })
       if (!res.ok) throw new Error('No se pudo cambiar el estado')
 

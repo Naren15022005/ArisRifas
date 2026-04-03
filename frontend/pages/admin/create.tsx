@@ -3,6 +3,8 @@ import { useRouter } from 'next/router'
 import AdminLayout from '../../components/AdminLayout'
 import RaffleCard from '../../components/RaffleCard'
 
+import { getBackendBaseUrl } from '../../lib/backend'
+
 type RaffleForm = {
   title: string
   short: string
@@ -70,7 +72,8 @@ export default function AdminCreate() {
 
     setSaving(true)
 
-    const base = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001') + '/api/raffles'
+    const base = getBackendBaseUrl() + '/api/raffles'
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
 
     if (imageFile) {
       const formData = new FormData()
@@ -85,7 +88,11 @@ export default function AdminCreate() {
       else formData.append('drawDate', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString())
       formData.append('isPublished', 'true')
 
-      fetch(base + '/with-image', { method: 'POST', body: formData })
+      fetch(base + '/with-image', {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        body: formData,
+      })
         .then(async (res) => {
           if (!res.ok) throw new Error(await res.text())
           return res.json()
@@ -127,7 +134,10 @@ export default function AdminCreate() {
 
       fetch(base, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(payload),
       })
         .then(async (res) => {

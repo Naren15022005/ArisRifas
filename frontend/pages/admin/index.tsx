@@ -7,6 +7,8 @@ const AdminRaffleModal = dynamic(() => import('../../components/AdminRaffleModal
 const AdminRaffleTicketsModal = dynamic(() => import('../../components/AdminRaffleTicketsModal'), { ssr: false })
 import Link from 'next/link'
 
+import { getBackendBaseUrl, normalizeBackendAssetUrl } from '../../lib/backend'
+
 type RaffleSummary = {
   id?: number
   title: string
@@ -40,18 +42,14 @@ export default function AdminDashboard() {
   }, [router])
 
   function normalizeImage(path?: string) {
-    if (!path) return '/images/placeholder.svg'
-    if (path.startsWith('http')) return path
-    if (path.startsWith('/')) return (process.env.NEXT_PUBLIC_BACKEND_URL || '') + path
-    // relative path from server
-    return (process.env.NEXT_PUBLIC_BACKEND_URL || '') + '/' + path
+    return normalizeBackendAssetUrl(path)
   }
 
   useEffect(() => {
     async function load() {
       setLoading(true)
       setError(null)
-      const base = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001')
+      const base = getBackendBaseUrl()
       const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
       try {
         const res = await fetch(base + '/api/raffles/admin/all', {

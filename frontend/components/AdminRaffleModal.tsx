@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react'
 
+import { getBackendBaseUrl, normalizeBackendAssetUrl } from '../lib/backend'
+
 type RaffleSummary = {
   id?: number
   title: string
@@ -25,10 +27,7 @@ const ADMIN_MODAL_STYLE: React.CSSProperties = {
 }
 
 function normalizeImage(path?: string) {
-  if (!path) return '/images/placeholder.svg'
-  if (path.startsWith('http')) return path
-  if (path.startsWith('/')) return (process.env.NEXT_PUBLIC_BACKEND_URL || '') + path
-  return (process.env.NEXT_PUBLIC_BACKEND_URL || '') + '/' + path
+  return normalizeBackendAssetUrl(path)
 }
 
 export default function AdminRaffleModal({ raffle, onClose, onSave, onDelete }: Props) {
@@ -55,7 +54,7 @@ export default function AdminRaffleModal({ raffle, onClose, onSave, onDelete }: 
 
   async function handleSave() {
     setSaving(true)
-    const base = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001'
+    const base = getBackendBaseUrl()
     const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
     const id = raffle.id
 
@@ -142,7 +141,7 @@ export default function AdminRaffleModal({ raffle, onClose, onSave, onDelete }: 
 
   async function handleDelete() {
     if (raffle.id) {
-      const base = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001'
+      const base = getBackendBaseUrl()
       const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
       try {
         const res = await fetch(`${base}/api/raffles/${raffle.id}`, {

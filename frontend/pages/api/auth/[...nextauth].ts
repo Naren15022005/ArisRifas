@@ -1,7 +1,10 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
+import { getBackendBaseUrl } from '../../../lib/backend';
+
 export default NextAuth({
+  secret: process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET,
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -10,7 +13,8 @@ export default NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/auth/login`, {
+        const baseUrl = getBackendBaseUrl()
+        const res = await fetch(`${baseUrl}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: credentials?.email, password: credentials?.password }),
@@ -24,6 +28,7 @@ export default NextAuth({
     }),
   ],
   session: { strategy: 'jwt' },
+  debug: process.env.NODE_ENV !== 'production',
   callbacks: {
     async jwt({ token, user }) {
       if (user && (user as any).accessToken) token.accessToken = (user as any).accessToken;

@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import type { CartItem } from '../contexts/CartContext'
 
+import { getBackendBaseUrl } from '../lib/backend'
+
 const ADMIN_WA = '573125102503' // Colombia +57
 
 function formatN(n: number) {
@@ -118,10 +120,14 @@ export default function CheckoutModal({ items, onClose, onFinish }: Props) {
 
     // Persist purchased numbers in backend so they queden marcados como vendidos
     try {
-      const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const base = getBackendBaseUrl()
+      const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
       await fetch(base + '/api/tickets/bulk-sell', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           items: items.map((i) => ({ raffleId: i.raffleId, numbers: i.numbers })),
         }),
