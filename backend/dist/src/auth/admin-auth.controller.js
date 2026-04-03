@@ -67,15 +67,26 @@ let AdminAuthController = class AdminAuthController {
         this.prisma = prisma;
     }
     async login(body) {
-        const { email, password } = body;
-        if (!email || !password) {
-            throw new common_1.BadRequestException('Email and password required');
+        try {
+            const { email, password } = body;
+            if (!email || !password) {
+                throw new common_1.BadRequestException('Email and password required');
+            }
+            const user = await this.authService.validateUser(email, password);
+            if (!user || user.role !== 'ADMIN') {
+                throw new common_1.BadRequestException('Invalid credentials');
+            }
+            return this.authService.login({ id: user.id, email: user.email, role: user.role });
         }
-        const user = await this.authService.validateUser(email, password);
-        if (!user || user.role !== 'ADMIN') {
-            throw new common_1.BadRequestException('Invalid credentials');
+        catch (err) {
+            try {
+                console.error('AdminAuthController.login error:', err && err.stack ? err.stack : err);
+            }
+            catch (logErr) {
+                // ignore logging errors
+            }
+            throw err;
         }
-        return this.authService.login({ id: user.id, email: user.email, role: user.role });
     }
     async register(body) {
         const { email, password, name } = body;
