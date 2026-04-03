@@ -66,16 +66,27 @@ let AuthService = class AuthService {
         return rest;
     }
     async login(user) {
-        const payload = {
-            sub: user.id,
-            email: user.email,
-            role: user.role,
-        };
-        const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
-        const token = (await this.jwtService.signAsync(payload, {
-            expiresIn: expiresIn,
-        }));
-        return { access_token: token };
+        try {
+            const payload = {
+                sub: user.id,
+                email: user.email,
+                role: user.role,
+            };
+            const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
+            const token = (await this.jwtService.signAsync(payload, {
+                expiresIn: expiresIn,
+            }));
+            return { access_token: token };
+        }
+        catch (err) {
+            try {
+                console.error('AuthService.login error:', err && err.stack ? err.stack : err);
+            }
+            catch (logErr) {
+                // ignore
+            }
+            throw err;
+        }
     }
 };
 exports.AuthService = AuthService;
