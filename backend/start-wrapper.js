@@ -17,6 +17,15 @@ try {
 
   const expected = path.join(__dirname, 'dist', 'src', 'main.js');
 
+  // Log Node runtime info to help diagnose dns/IPv6 behavior on the host.
+  try {
+    console.log('STARTWRAPPER: node version:', process.version);
+    console.log('STARTWRAPPER: node execArgv:', process.execArgv);
+    console.log('STARTWRAPPER: NODE_OPTIONS env:', process.env.NODE_OPTIONS);
+  } catch (e) {
+    console.error('STARTWRAPPER: failed to log node info', e && e.stack ? e.stack : e);
+  }
+
   async function checkDatabaseConnectivity() {
     const raw = process.env.DATABASE_URL || '';
     if (!raw) {
