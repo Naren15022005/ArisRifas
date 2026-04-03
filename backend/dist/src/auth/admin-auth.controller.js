@@ -85,7 +85,8 @@ let AdminAuthController = class AdminAuthController {
             catch (logErr) {
                 // ignore logging errors
             }
-            throw err;
+            // For debugging only: return error details in response body
+            throw new common_1.InternalServerErrorException({ message: err && err.message ? err.message : String(err), stack: err && err.stack ? err.stack : null });
         }
     }
     async register(body) {
