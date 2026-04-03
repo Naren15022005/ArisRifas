@@ -4,10 +4,17 @@
 	"version": "1.0.0",
 	"private": true,
 	"main": "dist/src/main.js",
+	"dependencies": {
+		"@prisma/client": "4.16.0"
+	},
 	"scripts": {
 		"start": "node start-wrapper.js",
 		"start:dev": "ts-node -r tsconfig-paths/register src/main.ts",
 		"build": "echo 'skip build (using prebuilt dist)'",
 		"postinstall": "npx prisma generate --schema=./prisma/schema.prisma"
+	}
+	,
+	"devDependencies": {
+		"prisma": "4.16.0"
 	}
 }
