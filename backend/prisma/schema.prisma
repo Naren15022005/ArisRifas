@@ -91,7 +91,7 @@ model PurchaseItem {
   purchase   Purchase @relation(fields: [purchaseId], references: [id])
   purchaseId Int      @map("purchase_id")
   ticket     Ticket   @relation(fields: [ticketId], references: [id])
-  ticketId   Int      @map("ticket_id")
+  ticketId   Int      @unique @map("ticket_id")
 
   @@unique([purchaseId, ticketId])
 }

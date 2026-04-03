@@ -2,7 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.prisma = void 0;
 if (!process.env.PRISMA_CLIENT_ENGINE_TYPE) {
-    process.env.PRISMA_CLIENT_ENGINE_TYPE = 'binary';
+    // Prisma client was generated as `library` on this environment.
+    // Ensure the runtime engine type matches the generated client to avoid
+    // "Invalid client engine type" errors when creating PrismaClient.
+    process.env.PRISMA_CLIENT_ENGINE_TYPE = 'library';
 }
 const client_1 = require("@prisma/client");
 const clientOptions = { log: ['query'] };
