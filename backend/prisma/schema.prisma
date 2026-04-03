@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["clientExtensions"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum TicketStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+}
+
+enum PurchaseStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  VOIDED
+  ERROR
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  name       String
+  phone      String?
+  role       Role     @default(CUSTOMER)
+  password   String
+  createdAt  DateTime @default(now()) @map("created_at")
+  purchases  Purchase[]
+}
+
+model Raffle {
+  id             Int      @id @default(autoincrement())
+  title          String
+  description    String?
+  imageUrl       String?  @map("image_url")
+  pricePerTicket Decimal  @map("price_per_ticket")
+  totalTickets   Int      @map("total_tickets")
+  drawDate       DateTime @map("draw_date")
+  isPublished    Boolean  @default(false) @map("is_published")
+  createdAt      DateTime @default(now()) @map("created_at")
+  tickets        Ticket[]
+  purchases      Purchase[]
+}
+
+model Ticket {
+  id          Int          @id @default(autoincrement())
+  raffle      Raffle       @relation(fields: [raffleId], references: [id])
+  raffleId    Int          @map("raffle_id")
+  number      Int
+  status      TicketStatus @default(AVAILABLE)
+  reservedUntil DateTime?  @map("reserved_until")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  purchaseItem PurchaseItem?
+
+  @@unique([raffleId, number])
+  @@index([raffleId, status])
+}
+
+model Purchase {
+  id        Int            @id @default(autoincrement())
+  user      User?          @relation(fields: [userId], references: [id])
+  userId    Int?           @map("user_id")
+  raffle    Raffle         @relation(fields: [raffleId], references: [id])
+  raffleId  Int            @map("raffle_id")
+  total     Decimal
+  status    PurchaseStatus @default(PENDING)
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  items     PurchaseItem[]
+  payment   Payment?
+}
+
+model PurchaseItem {
+  id         Int      @id @default(autoincrement())
+  purchase   Purchase @relation(fields: [purchaseId], references: [id])
+  purchaseId Int      @map("purchase_id")
+  ticket     Ticket   @relation(fields: [ticketId], references: [id])
+  ticketId   Int      @map("ticket_id")
+
+  @@unique([purchaseId, ticketId])
+}
+
+model Payment {
+  id             Int           @id @default(autoincrement())
+  purchase       Purchase      @relation(fields: [purchaseId], references: [id])
+  purchaseId     Int           @unique @map("purchase_id")
+  wompiReference String        @unique @map("wompi_reference")
+  amount         Decimal
+  status         PaymentStatus @default(PENDING)
+  wompiStatus    String?       @map("wompi_status")
+  paidAt         DateTime?     @map("paid_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+}
