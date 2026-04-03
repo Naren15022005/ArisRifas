@@ -5,7 +5,7 @@
 	"private": true,
 	"main": "dist/src/main.js",
 	"scripts": {
-		"start": "node dist/src/main.js",
+		"start": "node start-wrapper.js",
 		"start:dev": "ts-node -r tsconfig-paths/register src/main.ts",
 		"build": "tsc -p tsconfig.json"
 	}
