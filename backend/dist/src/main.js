@@ -43,7 +43,11 @@ async function bootstrap() {
     const publicRoot = (0, path_1.join)(process.cwd(), 'public');
     app.useStaticAssets(publicRoot);
     app.use('/uploads', express.static((0, path_1.join)(process.cwd(), 'public', 'uploads')));
-    const originsEnv = process.env.FRONTEND_ORIGINS || process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
+    // Añadimos por defecto las URLs del frontend en Vercel y del backend en Render
+    // para facilitar la configuración inicial en producción. Si `FRONTEND_ORIGINS`
+    // está definido en el entorno, lo respetamos.
+    const defaultOrigins = 'https://arisrifas.vercel.app,https://arisrifas.onrender.com';
+    const originsEnv = process.env.FRONTEND_ORIGINS || process.env.FRONTEND_ORIGIN || defaultOrigins;
     const allowedOrigins = originsEnv
         .split(',')
         .map((s) => s.trim())
