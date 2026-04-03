@@ -10,15 +10,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const base = getBackendBaseUrl()
+    console.log('Admin login proxy: base=', base)
     const upstream = await fetch(base + '/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     })
 
-    const data = await upstream.json().catch(() => ({} as any))
+    const text = await upstream.text().catch(() => '')
+    let data: any = {}
+    try {
+      data = text ? JSON.parse(text) : {}
+    } catch (parseErr) {
+      data = { raw: text }
+    }
+    console.log('Admin login proxy: upstream status=', upstream.status, 'ok=', upstream.ok, 'body=', data)
+
     if (!upstream.ok) {
-      return res.status(upstream.status).json({ message: data?.message || 'Invalid credentials' })
+      return res.status(upstream.status).json({ message: data?.message || 'Invalid credentials', upstreamBody: data })
     }
 
     // Backend returns { access_token }; expose as { token } to keep frontend code unchanged
