@@ -1,6 +1,6 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import Head from 'next/head'
+// Head moved to _document to avoid head mismatch/hydration warnings
 import { SessionProvider, useSession } from 'next-auth/react'
 import { useEffect } from 'react'
 import { api } from '../lib/api'
@@ -35,10 +35,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const svgFavicon = "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='100%25' height='100%25' fill='%2310B981'/%3E%3C/svg%3E"
   return (
     <SessionProvider session={session}>
-      <Head>
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="alternate icon" href={`data:image/svg+xml,${svgFavicon}`} />
-      </Head>
+      {/* Head links are defined in _document.tsx to ensure consistent SSR output */}
       <CartProvider>
         <AuthTokenSetter>
           <Component {...(rest as any)} />

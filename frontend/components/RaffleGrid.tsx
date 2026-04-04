@@ -6,6 +6,7 @@ function formatNumber(n: number) {
   return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 }
 import PurchaseModal, { Raffle as PurchaseRaffle } from './PurchaseModal'
+import { normalizeBackendAssetUrl } from '../lib/backend'
 
 type Raffle = PurchaseRaffle
 
@@ -39,14 +40,13 @@ function RaffleGrid({ items }: { items: Raffle[] }) {
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
         {localItems.map((r) => {
           const rawImg = (r as any).image || (r as any).imageUrl
-          const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-          const img = rawImg && String(rawImg).startsWith('/uploads') ? base + String(rawImg) : (rawImg || '/images/placeholder.svg')
+          const img = rawImg ? normalizeBackendAssetUrl(String(rawImg)) : '/images/placeholder.svg'
           const remaining = Number((r as any).remaining ?? (r as any).total ?? (r as any).totalTickets ?? 0) || 0
           return (
           <div key={r.id} className="p-0 sm:p-1">
             <div className="rounded-lg overflow-hidden h-full flex flex-col border-[1px]" style={{ borderColor: 'rgba(214,168,59,0.12)', background: 'linear-gradient(180deg,#0b0f13 0%, #080a0c 100%)' }}>
               <div className="w-full h-24 sm:h-36 md:h-40 lg:h-44 overflow-hidden">
-                <img loading="lazy" src={img} alt={r.title} className="w-full h-full object-cover" />
+                <img loading="lazy" src={img} alt={r.title} className="w-full h-full object-cover" onError={(e)=>{(e.currentTarget as HTMLImageElement).src='/images/placeholder.svg'}} />
               </div>
               <div className="p-2 sm:p-3 flex-1 flex flex-col">
                 <h3 className="text-lg sm:text-xl md:text-2xl font-extrabold text-white leading-tight mt-1 mb-1">{r.title}</h3>
@@ -66,7 +66,7 @@ function RaffleGrid({ items }: { items: Raffle[] }) {
                     onClick={() => {
                       // pass a normalized raffle object to the modal so it has
                       // resolved image URLs and numeric fields (price/remaining/total)
-                      setSelected({
+                        setSelected({
                         ...r,
                         image: img,
                         price: Number((r as any).price ?? (r as any).pricePerTicket ?? 0),

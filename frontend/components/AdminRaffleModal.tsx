@@ -179,6 +179,7 @@ export default function AdminRaffleModal({ raffle, onClose, onSave, onDelete }: 
                 src={imagePreview || '/images/placeholder.svg'}
                 className="w-full h-full object-cover"
                 alt={title || 'Imagen de la rifa'}
+                onError={(e)=>{(e.currentTarget as HTMLImageElement).src='/images/placeholder.svg'}}
               />
             </div>
             {editing && (

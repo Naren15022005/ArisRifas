@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import useNow from '../hooks/useNow'
+import { normalizeBackendAssetUrl } from '../lib/backend'
 
 // Style constants to avoid recreating inline objects on every render
 const CARD_STYLE = { background: '#0d0d0d', border: '1px solid rgba(212,175,55,0.15)' } as const
@@ -15,12 +16,9 @@ const GOLD_STYLE = { color: '#d4af37' } as const
 function resolveImageSrc(img?: string, imgUrl?: string) {
   const raw = img || imgUrl
   if (!raw) return '/images/placeholder.svg'
-  const s = String(raw)
-  if (s.startsWith('/uploads')) {
-    const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-    return base + s
-  }
-  return s
+  const s = String(raw).trim()
+  // Delegate to centralized normalizer which handles full URLs, leading/trailing slashes
+  return normalizeBackendAssetUrl(s)
 }
 
 type Props = {
@@ -145,7 +143,7 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
       <article className="h-full flex flex-col rounded-2xl overflow-hidden" style={CARD_STYLE}>
         {/* Image on top */}
         <div className="relative w-full h-40 sm:h-56 bg-[#111] overflow-hidden">
-          <img loading="lazy" src={resolveImageSrc(raffle.image, raffle.imageUrl)} alt={raffle.title} className="w-full h-full object-cover" />
+          <img loading="lazy" src={resolveImageSrc(raffle.image, raffle.imageUrl)} alt={raffle.title} className="w-full h-full object-cover" onError={(e)=>{(e.currentTarget as HTMLImageElement).src='/images/placeholder.svg'}} />
         </div>
 
         {/* Content below */}
@@ -296,6 +294,7 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
             src={resolveImageSrc(raffle.image, raffle.imageUrl)}
             alt={raffle.title}
             className="w-full h-full object-cover"
+            onError={(e)=>{(e.currentTarget as HTMLImageElement).src='/images/placeholder.svg'}}
           />
           {/* Subtle gradient overlay at bottom of image */}
           <div className="absolute inset-x-0 bottom-0 h-16" style={{ background: 'linear-gradient(to top, #0d0d0d, transparent)' }} />

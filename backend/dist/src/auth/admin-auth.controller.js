@@ -72,8 +72,11 @@ let AdminAuthController = class AdminAuthController {
             if (!email || !password) {
                 throw new common_1.BadRequestException('Email and password required');
             }
+            console.log('AdminAuthController.login received:', { email });
             const user = await this.authService.validateUser(email, password);
+            console.log('AdminAuthController.login validateUser result:', user);
             if (!user || user.role !== 'ADMIN') {
+                console.log('AdminAuthController.login invalid credentials - user or role mismatch', { user });
                 throw new common_1.BadRequestException('Invalid credentials');
             }
             return this.authService.login({ id: user.id, email: user.email, role: user.role });
