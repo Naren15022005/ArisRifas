@@ -6,8 +6,16 @@ import RaffleGrid from '../components/RaffleGrid'
 import BackgroundEffects from '../components/BackgroundEffects'
 
 export default function RifasPage() {
-  const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const fetcher = (url: string) => fetch(base + url).then((r) => r.ok ? r.json() : [])
+  const backendFnBase = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/+$/, '')
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const fetcher = (url: string) => {
+    // If a production backend function URL is set, map the internal API path
+    // '/api/raffles' to the function path '/raffles'. Otherwise use the API server.
+    const resolved = backendFnBase
+      ? `${backendFnBase}${url.replace(/^\/api\/raffles/, '/raffles')}`
+      : `${apiBase}${url}`
+    return fetch(resolved).then((r) => (r.ok ? r.json() : []))
+  }
   const { data: raffles = [] } = useSWR('/api/raffles', fetcher, { refreshInterval: 15000, revalidateOnFocus: false, dedupingInterval: 5000 })
 
   // Rifas que alcanzaron >=50% vendidas — se muestran en el carrusel

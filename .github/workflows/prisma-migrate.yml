@@ -1,0 +1,46 @@
+name: Prisma Migrate (deploy)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  migrate:
+    name: Deploy Prisma Migrations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies (backend)
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Generate Prisma Client
+        working-directory: ./backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: npx prisma generate --schema=./prisma/schema.prisma
+
+      - name: Deploy Prisma Migrations
+        working-directory: ./backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: |
+          npx prisma migrate deploy --schema=./prisma/schema.prisma
+
+      - name: Report success
+        if: ${{ success() }}
+        run: echo "Prisma migrations deployed successfully"
+
+# Notes:
+# - Add the following repository secrets in GitHub (Settings → Secrets → Actions):
+#   - DATABASE_URL : the runtime DATABASE_URL (pooler) if needed by scripts
+#   - DIRECT_URL   : the direct Postgres connection string (port 5432) used by Prisma migrations
+# - Run this workflow manually from the Actions tab (select "Prisma Migrate (deploy)" → Run workflow).

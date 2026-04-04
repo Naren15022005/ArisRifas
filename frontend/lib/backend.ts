@@ -34,6 +34,16 @@ export function normalizeBackendAssetUrl(path?: string) {
   if (!path) return '/images/placeholder.svg'
   if (path.startsWith('http://') || path.startsWith('https://')) return path
 
+  // If Supabase public storage is configured and the path points to uploads,
+  // return the Supabase public storage URL so the frontend fetches directly from storage.
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const uploadBucket = process.env.NEXT_PUBLIC_SUPABASE_UPLOAD_BUCKET
+  if (supabaseUrl && uploadBucket && (path.startsWith('/uploads') || path.startsWith('uploads'))) {
+    const base = supabaseUrl.replace(/\/+$/, '')
+    const key = path.replace(/^\/+/, '')
+    return `${base}/storage/v1/object/public/${uploadBucket}/${key}`
+  }
+
   const baseUrl = getBackendBaseUrl()
   if (path.startsWith('/')) return `${baseUrl}${path}`
   return `${baseUrl}/${path}`
