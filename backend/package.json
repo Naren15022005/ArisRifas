@@ -13,6 +13,7 @@
 		"@nestjs/schedule": "^6.1.1",
 		"@nestjs/websockets": "^11.1.17",
 		"@prisma/client": "4.16.0",
+		"@supabase/supabase-js": "^2.32.0",
 		"bcryptjs": "^3.0.3",
 		"class-transformer": "^0.5.1",
 		"class-validator": "^0.15.1",
@@ -28,12 +29,17 @@
 		"socket.io": "^4.8.3"
 	},
 	"scripts": {
-		"start": "npx prisma migrate deploy --schema=./prisma/schema.prisma && node start-wrapper.js",
+		"start": "node start-wrapper.js",
+		"upload:supabase": "node scripts/upload-to-supabase.js",
+		"check:supabase": "node scripts/check-supabase-env.js",
 		"start:dev": "ts-node -r tsconfig-paths/register src/main.ts",
 		"build": "echo 'skip build (using prebuilt dist)'",
 		"postinstall": "npx prisma generate --schema=./prisma/schema.prisma"
 	},
 	"devDependencies": {
-		"prisma": "4.16.0"
+		"prisma": "4.16.0",
+		"ts-node": "^10.9.2",
+		"tsconfig-paths": "^4.2.0",
+		"typescript": "^6.0.2"
 	}
 }

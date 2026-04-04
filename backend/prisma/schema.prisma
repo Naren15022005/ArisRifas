@@ -4,8 +4,13 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  // directUrl is used by Prisma for migration commands (direct DB connection)
+  // when using Supabase with a transaction pooler set in DATABASE_URL (pgbouncer),
+  // set DIRECT_URL to the direct Postgres connection (port 5432) and Prisma will
+  // use it for migrations while using DATABASE_URL at runtime.
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -62,8 +67,8 @@ model Purchase {
   user      User           @relation(fields: [userId], references: [id])
   items     PurchaseItem[]
 
-  @@index([raffleId], map: "Purchase_raffleId_fkey")
-  @@index([userId], map: "Purchase_userId_fkey")
+  @@index([raffleId])
+  @@index([userId])
 }
 
 model PurchaseItem {
@@ -94,7 +99,7 @@ model AuditLog {
   entity    String
   entityId  Int?
   action    String
-  payload   String?  @db.LongText
+  payload   String?  @db.Text
   createdAt DateTime @default(now())
 }
 
