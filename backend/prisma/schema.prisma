@@ -1,11 +1,109 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["clientExtensions"]
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  name      String
+  phone     String?
+  role      Role       @default(CUSTOMER)
+  password  String
+  createdAt DateTime   @default(now())
+  purchases Purchase[]
+}
+
+model Raffle {
+  id                Int        @id @default(autoincrement())
+  title             String
+  description       String?    @db.Text
+  imageUrl          String?
+  pricePerTicket    Decimal    @db.Decimal(10, 2)
+  totalTickets      Int
+  drawDate          DateTime
+  isPublished       Boolean    @default(false)
+  createdAt         DateTime   @default(now())
+  estimatedValue    Decimal?   @db.Decimal(10, 2)
+  associatedLottery String?    @db.VarChar(255)
+  purchases         Purchase[]
+  tickets           Ticket[]
+}
+
+model Ticket {
+  id            Int           @id @default(autoincrement())
+  raffleId      Int
+  number        Int
+  status        TicketStatus  @default(AVAILABLE)
+  reservedUntil DateTime?
+  createdAt     DateTime      @default(now())
+  purchaseItem  PurchaseItem?
+  raffle        Raffle        @relation(fields: [raffleId], references: [id])
+
+  @@unique([raffleId, number])
+  @@index([raffleId, status])
+}
+
+model Purchase {
+  id        Int            @id @default(autoincrement())
+  userId    Int
+  raffleId  Int
+  total     Decimal        @db.Decimal(10, 2)
+  status    PurchaseStatus @default(PENDING)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  payment   Payment?
+  raffle    Raffle         @relation(fields: [raffleId], references: [id])
+  user      User           @relation(fields: [userId], references: [id])
+  items     PurchaseItem[]
+
+  @@index([raffleId], map: "Purchase_raffleId_fkey")
+  @@index([userId], map: "Purchase_userId_fkey")
+}
+
+model PurchaseItem {
+  id         Int      @id @default(autoincrement())
+  purchaseId Int
+  ticketId   Int      @unique
+  purchase   Purchase @relation(fields: [purchaseId], references: [id])
+  ticket     Ticket   @relation(fields: [ticketId], references: [id])
+
+  @@unique([purchaseId, ticketId])
+}
+
+model Payment {
+  id             Int           @id @default(autoincrement())
+  purchaseId     Int           @unique
+  wompiReference String        @unique
+  amount         Decimal       @db.Decimal(10, 2)
+  status         PaymentStatus @default(PENDING)
+  wompiStatus    String?
+  paidAt         DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  purchase       Purchase      @relation(fields: [purchaseId], references: [id])
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  entity    String
+  entityId  Int?
+  action    String
+  payload   String?  @db.LongText
+  createdAt DateTime @default(now())
+}
+
+model IdempotencyKey {
+  id         Int      @id @default(autoincrement())
+  key        String   @unique
+  purchaseId Int?
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
 }
 
 enum Role {
@@ -31,80 +129,4 @@ enum PaymentStatus {
   DECLINED
   VOIDED
   ERROR
-}
-
-model User {
-  id         Int      @id @default(autoincrement())
-  email      String   @unique
-  name       String
-  phone      String?
-  role       Role     @default(CUSTOMER)
-  password   String
-  createdAt  DateTime @default(now()) @map("created_at")
-  purchases  Purchase[]
-}
-
-model Raffle {
-  id             Int      @id @default(autoincrement())
-  title          String
-  description    String?
-  imageUrl       String?  @map("image_url")
-  pricePerTicket Decimal  @map("price_per_ticket")
-  totalTickets   Int      @map("total_tickets")
-  drawDate       DateTime @map("draw_date")
-  isPublished    Boolean  @default(false) @map("is_published")
-  createdAt      DateTime @default(now()) @map("created_at")
-  tickets        Ticket[]
-  purchases      Purchase[]
-}
-
-model Ticket {
-  id          Int          @id @default(autoincrement())
-  raffle      Raffle       @relation(fields: [raffleId], references: [id])
-  raffleId    Int          @map("raffle_id")
-  number      Int
-  status      TicketStatus @default(AVAILABLE)
-  reservedUntil DateTime?  @map("reserved_until")
-  createdAt   DateTime     @default(now()) @map("created_at")
-  purchaseItem PurchaseItem?
-
-  @@unique([raffleId, number])
-  @@index([raffleId, status])
-}
-
-model Purchase {
-  id        Int            @id @default(autoincrement())
-  user      User?          @relation(fields: [userId], references: [id])
-  userId    Int?           @map("user_id")
-  raffle    Raffle         @relation(fields: [raffleId], references: [id])
-  raffleId  Int            @map("raffle_id")
-  total     Decimal
-  status    PurchaseStatus @default(PENDING)
-  createdAt DateTime       @default(now()) @map("created_at")
-  updatedAt DateTime       @updatedAt @map("updated_at")
-  items     PurchaseItem[]
-  payment   Payment?
-}
-
-model PurchaseItem {
-  id         Int      @id @default(autoincrement())
-  purchase   Purchase @relation(fields: [purchaseId], references: [id])
-  purchaseId Int      @map("purchase_id")
-  ticket     Ticket   @relation(fields: [ticketId], references: [id])
-  ticketId   Int      @unique @map("ticket_id")
-
-  @@unique([purchaseId, ticketId])
-}
-
-model Payment {
-  id             Int           @id @default(autoincrement())
-  purchase       Purchase      @relation(fields: [purchaseId], references: [id])
-  purchaseId     Int           @unique @map("purchase_id")
-  wompiReference String        @unique @map("wompi_reference")
-  amount         Decimal
-  status         PaymentStatus @default(PENDING)
-  wompiStatus    String?       @map("wompi_status")
-  paidAt         DateTime?     @map("paid_at")
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime      @updatedAt @map("updated_at")
 }
