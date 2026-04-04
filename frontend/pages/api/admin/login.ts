@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const base = getBackendBaseUrl()
     console.log('Admin login proxy: base=', base)
-    const upstream = await fetch(base + '/api/admin/login', {
+    const upstream = await fetch(base + '/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
