@@ -185,6 +185,36 @@ let RafflesController = class RafflesController {
             throw err;
         }
     }
+    async remove(id) {
+        try {
+            const deleted = await prisma_1.default.$transaction(async (tx) => {
+                const purchases = await tx.purchase.findMany({ where: { raffleId: id }, select: { id: true } });
+                const purchaseIds = purchases.map((p) => p.id);
+                if (purchaseIds.length > 0) {
+                    await tx.purchaseItem.deleteMany({ where: { purchaseId: { in: purchaseIds } } });
+                    await tx.payment.deleteMany({ where: { purchaseId: { in: purchaseIds } } });
+                    await tx.purchase.deleteMany({ where: { id: { in: purchaseIds } } });
+                }
+                await tx.ticket.deleteMany({ where: { raffleId: id } });
+                const r = await tx.raffle.delete({ where: { id } });
+                return r;
+            });
+            try {
+                if (this.rafflesService && this.rafflesService.rafflesGateway) {
+                    try {
+                        this.rafflesService.rafflesGateway.broadcastRaffleUpdated && this.rafflesService.rafflesGateway.broadcastRaffleUpdated(deleted);
+                    }
+                    catch (e) { }
+                }
+            }
+            catch (e) { }
+            return { ok: true };
+        }
+        catch (error) {
+            console.error('RafflesController.remove error:', error);
+            throw new common_1.HttpException('No se pudo eliminar la rifa', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     async health() {
         try {
             const res = await prisma_1.default.$queryRaw `SELECT 1 as ok`;
@@ -343,6 +373,14 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], RafflesController.prototype, "findAvailableTickets", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_admin_guard_1.JwtAdminGuard),
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], RafflesController.prototype, "remove", null);
 exports.RafflesController = RafflesController = __decorate([
     (0, common_1.Controller)('api/raffles'),
     __metadata("design:paramtypes", [raffles_service_1.RafflesService,
