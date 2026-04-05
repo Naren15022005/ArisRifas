@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styles from './WhatsAppFab.module.css'
 
 export default function WhatsAppFab() {
-  const phone = '5491123456789' // replace with real number (international format, no +)
+  const phone = '573117561209' // Colombia +57 311 7561209 (international format, no +)
   const message = encodeURIComponent('Hola! Quiero más información sobre las rifas.')
   const [extraBottom, setExtraBottom] = useState(0)
   const [visible, setVisible] = useState(true)

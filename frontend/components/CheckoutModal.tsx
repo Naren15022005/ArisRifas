@@ -3,7 +3,7 @@ import type { CartItem } from '../contexts/CartContext'
 
 import { getBackendBaseUrl } from '../lib/backend'
 
-const ADMIN_WA = '573125102503' // Colombia +57
+const ADMIN_WA = '573117561209' // Colombia +57 311 7561209
 
 function formatN(n: number) {
   return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
