@@ -57,6 +57,22 @@ const fs = __importStar(require("fs"));
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const create_raffle_dto_1 = require("./dto/create-raffle.dto");
 const raffles_service_1 = require("./raffles.service");
+const supabase_js_1 = require("@supabase/supabase-js");
+const supabaseClient = (0, supabase_js_1.createClient)(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+async function uploadToSupabase(file) {
+    const bucket = process.env.SUPABASE_UPLOAD_BUCKET || 'uploads';
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2,8)}${require('path').extname(file.originalname)}`;
+    const { error } = await supabaseClient.storage.from(bucket).upload(filename, file.buffer, {
+        contentType: file.mimetype,
+        upsert: false,
+    });
+    if (error) throw new Error('Upload failed: ' + error.message);
+    const { data } = supabaseClient.storage.from(bucket).getPublicUrl(filename);
+    return data.publicUrl;
+}
 const tickets_service_1 = require("../tickets/tickets.service");
 const jwt_admin_guard_1 = require("../auth/jwt-admin.guard");
 let RafflesController = class RafflesController {
@@ -93,7 +109,7 @@ let RafflesController = class RafflesController {
     async createWithImage(file, dto) {
         if (!file)
             throw new common_1.BadRequestException('Imagen requerida');
-        const imageUrl = `/uploads/${file.filename}`;
+            const imageUrl = await uploadToSupabase(file);
         const price = Number(dto.pricePerTicket);
         const total = Number(dto.totalTickets);
         if (Number.isNaN(price) || Number.isNaN(total)) {
@@ -141,7 +157,7 @@ let RafflesController = class RafflesController {
     async updateWithImage(id, file, dto) {
         if (!file)
             throw new common_1.BadRequestException('Imagen requerida');
-        const imageUrl = `/uploads/${file.filename}`;
+            const imageUrl = await uploadToSupabase(file);
         const price = dto.pricePerTicket !== undefined ? Number(dto.pricePerTicket) : undefined;
         const total = dto.totalTickets !== undefined ? Number(dto.totalTickets) : undefined;
         if (price !== undefined && Number.isNaN(price)) {
@@ -265,21 +281,8 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_admin_guard_1.JwtAdminGuard),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', {
-        storage: (0, multer_1.diskStorage)({
-            destination: (req, file, cb) => {
-                const uploadDir = 'public/uploads';
-                try {
-                    fs.mkdirSync(uploadDir, { recursive: true });
-                }
-                catch (e) {
-                }
-                cb(null, uploadDir);
-            },
-            filename: (req, file, cb) => {
-                const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${(0, path_1.extname)(file.originalname)}`;
-                cb(null, name);
-            },
-        }),
+            storage: (0, multer_1.memoryStorage)(),
+        })),
     })),
     (0, common_1.Post)('with-image'),
     __param(0, (0, common_1.UploadedFile)()),
