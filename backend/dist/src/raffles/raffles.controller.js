@@ -283,7 +283,6 @@ __decorate([
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', {
             storage: (0, multer_1.memoryStorage)(),
         })),
-    })),
     (0, common_1.Post)('with-image'),
     __param(0, (0, common_1.UploadedFile)()),
     __param(1, (0, common_1.Body)()),
@@ -301,21 +300,7 @@ __decorate([
 ], RafflesController.prototype, "update", null);
 __decorate([
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', {
-        storage: (0, multer_1.diskStorage)({
-            destination: (req, file, cb) => {
-                const uploadDir = 'public/uploads';
-                try {
-                    fs.mkdirSync(uploadDir, { recursive: true });
-                }
-                catch (e) {
-                }
-                cb(null, uploadDir);
-            },
-            filename: (req, file, cb) => {
-                const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${(0, path_1.extname)(file.originalname)}`;
-                cb(null, name);
-            },
-        }),
+        storage: (0, multer_1.memoryStorage)(),
     })),
     (0, common_1.Put)(':id/with-image'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -364,3 +349,4 @@ exports.RafflesController = RafflesController = __decorate([
         tickets_service_1.TicketsService])
 ], RafflesController);
 //# sourceMappingURL=raffles.controller.js.map
+
