@@ -58,22 +58,59 @@ const prisma_1 = __importDefault(require("../lib/prisma"));
 const create_raffle_dto_1 = require("./dto/create-raffle.dto");
 const raffles_service_1 = require("./raffles.service");
 const supabase_js_1 = require("@supabase/supabase-js");
-let supabaseClient;
-function getSupabase() {
-    if (!supabaseClient) {
-        supabaseClient = (0, supabase_js_1.createClient)(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+let supabaseClient = null;
+
+// Debug: presence of Supabase-related env vars (DO NOT log secrets)
+(function logSupabasePresence() {
+    try {
+        const status = {
+            SUPABASE_URL: !!process.env.SUPABASE_URL,
+            SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+            SUPABASE_KEY: !!process.env.SUPABASE_KEY,
+            SUPABASE_ANON_KEY: !!process.env.SUPABASE_ANON_KEY,
+            SUPABASE_UPLOAD_BUCKET: !!process.env.SUPABASE_UPLOAD_BUCKET,
+        };
+        console.error('Supabase env presence:', status);
     }
-    return supabaseClient;
+    catch (e) {
+        console.error('Error checking supabase env presence:', e && e.message ? e.message : e);
+    }
+})();
+
+function getSupabase() {
+    if (supabaseClient)
+        return supabaseClient;
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
+    if (!url || !key) {
+        console.error('Supabase client not initialized: missing SUPABASE_URL or SUPABASE key (SERVICE_ROLE/KEY/ANON).');
+        return null;
+    }
+    try {
+        supabaseClient = (0, supabase_js_1.createClient)(url, key);
+        return supabaseClient;
+    }
+    catch (e) {
+        console.error('Failed to initialize Supabase client:', e && e.message ? e.message : e);
+        supabaseClient = null;
+        return null;
+    }
 }
+
 async function uploadToSupabase(file) {
     const bucket = process.env.SUPABASE_UPLOAD_BUCKET || 'uploads';
-    const filename = `${Date.now()}-${Math.random().toString(36).slice(2,8)}${require('path').extname(file.originalname)}`;
-    const { error } = await getSupabase().storage.from(bucket).upload(filename, file.buffer, {
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${require('path').extname(file.originalname)}`;
+    const supabase = getSupabase();
+    if (!supabase) {
+        throw new Error('Supabase client not initialized. Check SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in environment.');
+    }
+    const { error } = await supabase.storage.from(bucket).upload(filename, file.buffer, {
         contentType: file.mimetype,
         upsert: false,
     });
-    if (error) throw new Error('Upload failed: ' + error.message);
-    const { data } = getSupabase().storage.from(bucket).getPublicUrl(filename);
+    if (error)
+        throw new Error('Upload failed: ' + error.message);
+    const { data } = supabase.storage.from(bucket).getPublicUrl(filename);
     return data.publicUrl;
 }
 const tickets_service_1 = require("../tickets/tickets.service");
