@@ -66,7 +66,7 @@ let supabaseClient = null;
         const status = {
             SUPABASE_URL: !!process.env.SUPABASE_URL,
             SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-            SUPABASE_KEY: !!process.env.SUPABASE_KEY,
+            SUPABASE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
             SUPABASE_ANON_KEY: !!process.env.SUPABASE_ANON_KEY,
             SUPABASE_UPLOAD_BUCKET: !!process.env.SUPABASE_UPLOAD_BUCKET,
         };
@@ -81,7 +81,7 @@ function getSupabase() {
     if (supabaseClient)
         return supabaseClient;
     const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
     if (!url || !key) {
         console.error('Supabase client not initialized: missing SUPABASE_URL or SUPABASE key (SERVICE_ROLE/KEY/ANON).');
         return null;
