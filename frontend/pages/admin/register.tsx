@@ -23,7 +23,7 @@ export default function AdminRegister() {
     }
     setLoading(true)
     try {
-      const res = await fetch('/api/admin/register', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name.trim(), email: email.trim(), password }),

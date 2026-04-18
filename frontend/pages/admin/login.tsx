@@ -17,7 +17,7 @@ export default function AdminLogin() {
     setError(null)
     setLoading(true)
     try {
-      const res = await fetch('/api/admin/login', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
