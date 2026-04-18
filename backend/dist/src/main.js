@@ -62,16 +62,20 @@ async function bootstrap() {
     app.use('/uploads', express.static((0, path_1.join)(process.cwd(), 'public', 'uploads')));
     // Añadimos por defecto las URLs del frontend en Vercel y del backend en Render
     // para facilitar la configuración inicial en producción. Si `FRONTEND_ORIGINS`
-    // está definido en el entorno, lo respetamos.
+    // está definido en el entorno, lo respetamos. Permitimos que el valor
+    // "*" actúe como wildcard para aceptar todos los orígenes en producción.
     const defaultOrigins = 'https://arisrifas.vercel.app,https://arisrifas.onrender.com';
-    const originsEnv = process.env.FRONTEND_ORIGINS || process.env.FRONTEND_ORIGIN || defaultOrigins;
-    const allowedOrigins = originsEnv
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean);
+    const originsEnv = (process.env.FRONTEND_ORIGINS || process.env.FRONTEND_ORIGIN || defaultOrigins || '').toString();
+    const allowAnyOrigin = originsEnv.trim() === '*';
+    const allowedOrigins = allowAnyOrigin
+        ? []
+        : originsEnv
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
     const isDev = process.env.NODE_ENV !== 'production';
     app.enableCors({
-        origin: isDev
+        origin: isDev || allowAnyOrigin
             ? true
             : (origin, callback) => {
                 if (!origin)
