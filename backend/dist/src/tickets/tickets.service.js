@@ -92,7 +92,7 @@ let TicketsService = class TicketsService {
         }
         return { ok: true };
     }
-    async bulkMarkSold(items) {
+    async bulkMarkSold(items, buyer) {
         if (!items || items.length === 0)
             return { updated: 0 };
         const result = await prisma_1.default.$transaction(async (tx) => {
@@ -107,7 +107,7 @@ let TicketsService = class TicketsService {
                         number: { in: nums },
                         status: 'AVAILABLE',
                     },
-                    data: { status: 'SOLD', reservedUntil: null },
+                    data: Object.assign({ status: 'SOLD', reservedUntil: null }, (buyer ? { purchaserName: buyer.name || null, purchaserPhone: buyer.phone || null } : {})),
                 });
                 updated += res.count ?? 0;
             }

@@ -14,6 +14,8 @@ type Ticket = {
   id: number
   number: number
   status: 'AVAILABLE' | 'RESERVED' | 'SOLD'
+  purchaserName?: string | null
+  purchaserPhone?: string | null
 }
 
 export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffleTicketsModalProps) {
@@ -199,10 +201,13 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
                         key={t.id}
                         type="button"
                         onClick={() => handleRevertSold(t)}
-                        className="flex items-center justify-center h-9 rounded-xl bg-[#180708] text-red-100 text-[11px] border border-red-700/70 shadow-sm hover:border-yellow-400 hover:bg-[#2a0b0d] transition-colors cursor-pointer"
-                        title="Click para devolver este número a disponible"
+                        className="flex flex-col items-center justify-center h-9 rounded-xl bg-[#180708] text-red-100 text-[11px] border border-red-700/70 shadow-sm hover:border-yellow-400 hover:bg-[#2a0b0d] transition-colors cursor-pointer"
+                        title={t.purchaserName || t.purchaserPhone ? `${t.purchaserName || ''} ${t.purchaserPhone || ''}`.trim() : 'Click para devolver este número a disponible'}
                       >
-                        {String(t.number).padStart(3, '0')}
+                        <span>{String(t.number).padStart(3, '0')}</span>
+                        { (t.purchaserName || t.purchaserPhone) && (
+                          <span className="text-[9px] text-gray-300 mt-0.5">{t.purchaserName ? t.purchaserName : t.purchaserPhone}</span>
+                        ) }
                       </button>
                     ))}
                   </div>

@@ -58,19 +58,22 @@ const prisma_1 = __importDefault(require("../lib/prisma"));
 const create_raffle_dto_1 = require("./dto/create-raffle.dto");
 const raffles_service_1 = require("./raffles.service");
 const supabase_js_1 = require("@supabase/supabase-js");
-const supabaseClient = (0, supabase_js_1.createClient)(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+let supabaseClient;
+function getSupabase() {
+    if (!supabaseClient) {
+        supabaseClient = (0, supabase_js_1.createClient)(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+    }
+    return supabaseClient;
+}
 async function uploadToSupabase(file) {
     const bucket = process.env.SUPABASE_UPLOAD_BUCKET || 'uploads';
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2,8)}${require('path').extname(file.originalname)}`;
-    const { error } = await supabaseClient.storage.from(bucket).upload(filename, file.buffer, {
+    const { error } = await getSupabase().storage.from(bucket).upload(filename, file.buffer, {
         contentType: file.mimetype,
         upsert: false,
     });
     if (error) throw new Error('Upload failed: ' + error.message);
-    const { data } = supabaseClient.storage.from(bucket).getPublicUrl(filename);
+    const { data } = getSupabase().storage.from(bucket).getPublicUrl(filename);
     return data.publicUrl;
 }
 const tickets_service_1 = require("../tickets/tickets.service");

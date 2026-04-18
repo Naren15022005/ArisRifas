@@ -19,8 +19,8 @@ export default function useRafflesSocket(
         const { io } = await import('socket.io-client');
         const base = getBackendBaseUrl();
         const url = base.replace(/\/$/, '');
-        // connect to namespace /raffles
-        const socket = io(url + '/raffles', { transports: ['websocket'] });
+        // connect to namespace /raffles — allow polling fallback in case websockets are blocked
+        const socket = io(url + '/raffles', { transports: ['polling', 'websocket'] });
         sockRef.current = socket;
 
         socket.on('connect', () => {

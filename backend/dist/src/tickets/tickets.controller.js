@@ -35,7 +35,8 @@ let TicketsController = class TicketsController {
         return this.ticketsService.revertToAvailable(id);
     }
     async bulkSell(body) {
-        return this.ticketsService.bulkMarkSold(body.items || []);
+        // accept optional buyer info in body.buyer { name, phone }
+        return this.ticketsService.bulkMarkSold(body.items || [], body.buyer || null);
     }
     async send(body) {
         return this.ticketsService.sendTicket(body);

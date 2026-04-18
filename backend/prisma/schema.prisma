@@ -46,6 +46,8 @@ model Ticket {
   number        Int
   status        TicketStatus  @default(AVAILABLE)
   reservedUntil DateTime?
+  purchaserName String?
+  purchaserPhone String?
   createdAt     DateTime      @default(now())
   purchaseItem  PurchaseItem?
   raffle        Raffle        @relation(fields: [raffleId], references: [id])

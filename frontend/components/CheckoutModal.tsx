@@ -129,6 +129,7 @@ export default function CheckoutModal({ items, onClose, onFinish }: Props) {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
+          buyer: { name: name.trim(), phone: phone.trim() },
           items: items.map((i) => ({ raffleId: i.raffleId, numbers: i.numbers })),
         }),
       })
