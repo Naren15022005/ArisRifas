@@ -201,6 +201,14 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
           <div className="fixed inset-0 z-50 flex items-center justify-center px-3 sm:px-4">
             <div className="absolute inset-0 bg-black/80" onClick={() => setShowBuyersModal(false)} />
             <div className="relative z-10 w-full max-w-lg sm:max-w-xl bg-[#050505] rounded-2xl border border-yellow-700/70 shadow-2xl p-3 sm:p-5 max-h-[85vh] flex flex-col">
+              <button
+                type="button"
+                onClick={() => setShowBuyersModal(false)}
+                aria-label="Cerrar compradores"
+                className="absolute top-3 right-3 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5"
+              >
+                Cerrar
+              </button>
               <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
                 <div>
                   <h3 className="text-base sm:text-lg font-semibold text-white">Compradores</h3>
@@ -216,7 +224,6 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
                     pattern="[0-9,\-\s]*"
                     className="w-full sm:w-64 text-sm p-2 rounded-lg bg-[#0b0b0b] border border-[#222] text-white"
                   />
-                  <button type="button" onClick={() => setShowBuyersModal(false)} className="text-gray-400 hover:text-white text-xs px-2 py-1 rounded-lg hover:bg-white/5">Cerrar</button>
                 </div>
               </header>
 
