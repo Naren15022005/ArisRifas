@@ -256,7 +256,9 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
                   <input
                     value={buyerSearch}
                     onChange={(e) => setBuyerSearch(e.target.value)}
-                    placeholder="Buscar por nombre, teléfono o número..."
+                    placeholder="Buscar por número de boleta..."
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     className="w-full sm:w-64 text-sm p-2 rounded-lg bg-[#0b0b0b] border border-[#222] text-white"
                   />
                   <button type="button" onClick={() => setShowBuyersModal(false)} className="text-gray-400 hover:text-white text-xs px-2 py-1 rounded-lg hover:bg-white/5">Cerrar</button>
@@ -270,13 +272,10 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
                   <div className="grid grid-cols-1 gap-3">
                     {buyers
                       .filter((b) => {
-                        if (!buyerSearch) return true
-                        const s = buyerSearch.toLowerCase()
-                        if ((b.name || '').toLowerCase().includes(s)) return true
-                        if ((b.phone || '').toLowerCase().includes(s)) return true
-                        if (b.tickets.some((n) => String(n).includes(s))) return true
-                        return false
-                      })
+                          if (!buyerSearch) return true
+                          const s = buyerSearch.trim()
+                          return b.tickets.some((n) => String(n).includes(s))
+                        })
                         .map((b, idx) => (
                         <div key={idx} className="p-3 rounded-xl bg-[#0b0b0b] border border-[#222] flex flex-col sm:flex-row justify-between gap-3">
                           <div className="flex-1">
