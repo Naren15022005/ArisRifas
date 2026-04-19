@@ -312,9 +312,21 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
                             {b.phone && <div className="text-xs text-gray-400">{b.phone}</div>}
                             <div className="mt-2 text-[11px] text-gray-300">Boletas:</div>
                             <div className="flex flex-wrap gap-2 mt-2">
-                              {b.tickets.map((n) => (
-                                <span key={n} className="inline-flex items-center justify-center px-2 py-1 rounded bg-[#111] text-xs text-gray-200 border border-white/5">{String(n).padStart(3,'0')}</span>
-                              ))}
+                              {b.tickets.map((n, idx) => {
+                                const id = b.ids && b.ids[idx]
+                                const ticketObj = id ? tickets.find((tt) => tt.id === id) : undefined
+                                return (
+                                  <button
+                                    key={n}
+                                    type="button"
+                                    onClick={() => ticketObj && handleRevertSold(ticketObj)}
+                                    title={ticketObj ? (ticketObj.purchaserName || ticketObj.purchaserPhone ? `${ticketObj.purchaserName || ''} ${ticketObj.purchaserPhone || ''}`.trim() : 'Click para devolver este número a disponible') : 'Boleta'}
+                                    className="inline-flex items-center justify-center px-2 py-1 rounded bg-[#111] text-xs text-gray-200 border border-white/5 hover:bg-[#222] transition-colors"
+                                  >
+                                    {String(n).padStart(3,'0')}
+                                  </button>
+                                )
+                              })}
                             </div>
                           </div>
                           <div className="flex-shrink-0 text-right">
