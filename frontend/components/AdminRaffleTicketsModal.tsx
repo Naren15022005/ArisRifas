@@ -22,7 +22,6 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showSoldModal, setShowSoldModal] = useState(false)
   const [showBuyersModal, setShowBuyersModal] = useState(false)
   const [buyerSearch, setBuyerSearch] = useState('')
 
@@ -150,7 +149,7 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
               </div>
               <button
                 type="button"
-                onClick={() => sold.length > 0 && setShowSoldModal(true)}
+                onClick={() => sold.length > 0 && setShowBuyersModal(true)}
                 className="bg-red-900/40 rounded-xl px-3 py-3 border border-red-700/60 flex flex-col justify-between min-h-[80px] col-span-2 text-left hover:border-red-400/70 hover:bg-red-900/60 transition-colors"
               >
                 <div className="flex items-center justify-between gap-3">
@@ -159,7 +158,6 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
                       Comprados
                       {sold.length > 0 && (
                         <div className="inline-flex items-center gap-2">
-                          <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-[10px] bg-red-800/70 text-red-100 border border-red-500/60">ver listado</span>
                           <button
                             type="button"
                             onClick={() => setShowBuyersModal(true)}
@@ -197,50 +195,7 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
           </>
         )}
 
-        {showSoldModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center px-3 sm:px-4">
-            <div className="absolute inset-0 bg-black/80" onClick={() => setShowSoldModal(false)} />
-            <div className="relative z-10 w-full max-w-xl bg-[#050505] rounded-2xl border border-red-700/70 shadow-2xl p-4 sm:p-5 max-h-[85vh] flex flex-col">
-              <header className="flex items-start justify-between gap-3 mb-3">
-                <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-white">Boletas compradas</h3>
-                  <p className="text-xs text-gray-400">{raffle.title}</p>
-                  <p className="text-[11px] text-red-200/80 mt-1">Total compradas: {sold.length}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowSoldModal(false)}
-                  className="text-gray-400 hover:text-white text-xs px-2 py-1 rounded-lg hover:bg-white/5"
-                >
-                  Cerrar
-                </button>
-              </header>
-
-              <div className="flex-1 overflow-auto">
-                {sold.length === 0 ? (
-                  <div className="text-xs text-gray-500">Aún no hay boletas compradas.</div>
-                ) : (
-                  <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 gap-1.5 pr-1">
-                    {sold.map((t) => (
-                      <button
-                        key={t.id}
-                        type="button"
-                        onClick={() => handleRevertSold(t)}
-                        className="flex flex-col items-center justify-center h-9 rounded-xl bg-[#180708] text-red-100 text-[11px] border border-red-700/70 shadow-sm hover:border-yellow-400 hover:bg-[#2a0b0d] transition-colors cursor-pointer"
-                        title={t.purchaserName || t.purchaserPhone ? `${t.purchaserName || ''} ${t.purchaserPhone || ''}`.trim() : 'Click para devolver este número a disponible'}
-                      >
-                        <span>{String(t.number).padStart(3, '0')}</span>
-                        { (t.purchaserName || t.purchaserPhone) && (
-                          <span className="text-[9px] text-gray-300 mt-0.5">{t.purchaserName ? t.purchaserName : t.purchaserPhone}</span>
-                        ) }
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        
 
         {showBuyersModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center px-3 sm:px-4">
