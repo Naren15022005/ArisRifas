@@ -245,19 +245,19 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
         {showBuyersModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center px-3 sm:px-4">
             <div className="absolute inset-0 bg-black/80" onClick={() => setShowBuyersModal(false)} />
-            <div className="relative z-10 w-full max-w-xl bg-[#050505] rounded-2xl border border-yellow-700/70 shadow-2xl p-4 sm:p-5 max-h-[85vh] flex flex-col">
-              <header className="flex items-start justify-between gap-3 mb-3">
+            <div className="relative z-10 w-full max-w-lg sm:max-w-xl bg-[#050505] rounded-2xl border border-yellow-700/70 shadow-2xl p-3 sm:p-5 max-h-[85vh] flex flex-col">
+              <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
                 <div>
                   <h3 className="text-base sm:text-lg font-semibold text-white">Compradores</h3>
                   <p className="text-xs text-gray-400">Listado de compradores y sus boletas</p>
                   <p className="text-[11px] text-yellow-200/80 mt-1">Total compradores: {buyers.length}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex w-full sm:w-auto flex-col sm:flex-row items-start sm:items-center gap-2">
                   <input
                     value={buyerSearch}
                     onChange={(e) => setBuyerSearch(e.target.value)}
                     placeholder="Buscar por nombre, teléfono o número..."
-                    className="text-sm p-2 rounded-lg bg-[#0b0b0b] border border-[#222] text-white"
+                    className="w-full sm:w-64 text-sm p-2 rounded-lg bg-[#0b0b0b] border border-[#222] text-white"
                   />
                   <button type="button" onClick={() => setShowBuyersModal(false)} className="text-gray-400 hover:text-white text-xs px-2 py-1 rounded-lg hover:bg-white/5">Cerrar</button>
                 </div>
@@ -267,7 +267,7 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
                 {buyers.length === 0 ? (
                   <div className="text-sm text-gray-500">Aún no hay compradores registrados.</div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3">
                     {buyers
                       .filter((b) => {
                         if (!buyerSearch) return true
@@ -277,25 +277,21 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
                         if (b.tickets.some((n) => String(n).includes(s))) return true
                         return false
                       })
-                      .map((b, idx) => (
-                        <div key={idx} className="p-3 rounded-xl bg-[#0b0b0b] border border-[#222]">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="text-sm font-semibold text-white">{b.name}</div>
-                              {b.phone && <div className="text-xs text-gray-400">{b.phone}</div>}
-                            </div>
-                            <div className="text-right">
-                              <div className="text-sm font-semibold text-yellow-200">{b.tickets.length} boleta(s)</div>
-                              <div className="text-xs text-gray-400">{b.tickets.slice(0,6).map(n => String(n).padStart(3,'0')).join(', ')}{b.tickets.length>6 ? '…' : ''}</div>
-                            </div>
-                          </div>
-                          <div className="mt-3">
-                            <div className="text-[11px] text-gray-300">Boletas:</div>
+                        .map((b, idx) => (
+                        <div key={idx} className="p-3 rounded-xl bg-[#0b0b0b] border border-[#222] flex flex-col sm:flex-row justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="text-sm font-semibold text-white">{b.name}</div>
+                            {b.phone && <div className="text-xs text-gray-400">{b.phone}</div>}
+                            <div className="mt-2 text-[11px] text-gray-300">Boletas:</div>
                             <div className="flex flex-wrap gap-2 mt-2">
                               {b.tickets.map((n) => (
                                 <span key={n} className="inline-flex items-center justify-center px-2 py-1 rounded bg-[#111] text-xs text-gray-200 border border-white/5">{String(n).padStart(3,'0')}</span>
                               ))}
                             </div>
+                          </div>
+                          <div className="flex-shrink-0 text-right">
+                            <div className="text-sm font-semibold text-yellow-200">{b.tickets.length} boleta(s)</div>
+                            <div className="text-xs text-gray-400 mt-1 hidden sm:block">{b.tickets.slice(0,6).map(n => String(n).padStart(3,'0')).join(', ')}{b.tickets.length>6 ? '…' : ''}</div>
                           </div>
                         </div>
                       ))}
