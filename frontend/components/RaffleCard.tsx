@@ -223,7 +223,7 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
 
           {/* Title & description */}
           <div>
-            <h3 className="font-extrabold text-3xl lg:text-4xl text-white leading-tight">{raffle.title}</h3>
+            <h3 className="font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white leading-tight">{raffle.title}</h3>
             {displayShort && (
               <p className="text-sm text-gray-500 mt-1.5 leading-relaxed">{displayShort}</p>
             )}
@@ -267,7 +267,7 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
           )}
 
           {/* CTA buttons */}
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-col sm:flex-row">
             <button
               type="button"
               aria-label={`Comprar ${raffle.title}`}
@@ -288,7 +288,7 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
         </div>
 
         {/* Image column */}
-        <div className="order-1 sm:order-2 relative overflow-hidden h-full" style={IMAGE_BG_STYLE}>
+        <div className="order-1 sm:order-2 relative overflow-hidden h-40 sm:h-full" style={IMAGE_BG_STYLE}>
           <img
             loading="lazy"
             src={resolveImageSrc(raffle.image, raffle.imageUrl)}
