@@ -34,10 +34,9 @@ export default function AdminRegister() {
         setLoading(false)
         return
       }
-      // persist token and go to dashboard
-      if (body.token) {
-        localStorage.setItem('admin_token', body.token)
-      }
+      // persist token and go to dashboard (backend returns access_token)
+      const token = body.token || body.access_token
+      if (token) localStorage.setItem('admin_token', token)
       router.push('/admin')
     } catch (e) {
       setError('Error de conexión')

@@ -33,8 +33,9 @@ export default function AdminLogin() {
       }
 
       const body = await res.json()
-      // persist a simple token for client-side guard
-      localStorage.setItem('admin_token', body.token)
+      // backend may return { access_token } or { token } (compat)
+      const token = body.token || body.access_token
+      if (token) localStorage.setItem('admin_token', token)
       setToastType('success')
       setToastMsg('Inicio de sesión exitoso')
       router.push('/admin')
