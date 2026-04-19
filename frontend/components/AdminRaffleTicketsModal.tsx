@@ -256,9 +256,9 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
                   <input
                     value={buyerSearch}
                     onChange={(e) => setBuyerSearch(e.target.value)}
-                    placeholder="Buscar por número de boleta..."
+                    placeholder="Buscar por número(s) de boleta (ej. 12, 15-20)"
                     inputMode="numeric"
-                    pattern="[0-9]*"
+                    pattern="[0-9,\-\s]*"
                     className="w-full sm:w-64 text-sm p-2 rounded-lg bg-[#0b0b0b] border border-[#222] text-white"
                   />
                   <button type="button" onClick={() => setShowBuyersModal(false)} className="text-gray-400 hover:text-white text-xs px-2 py-1 rounded-lg hover:bg-white/5">Cerrar</button>
@@ -273,8 +273,37 @@ export default function AdminRaffleTicketsModal({ raffle, onClose }: AdminRaffle
                     {buyers
                       .filter((b) => {
                           if (!buyerSearch) return true
-                          const s = buyerSearch.trim()
-                          return b.tickets.some((n) => String(n).includes(s))
+                          // build set of target ticket numbers from input like "12, 15-20"
+                          const parts = buyerSearch.split(/[,\s]+/).map(p => p.trim()).filter(Boolean)
+                          const targets = new Set<number>()
+                          for (const p of parts) {
+                            if (p.includes('-')) {
+                              const [aRaw, bRaw] = p.split('-').map(x => x.trim())
+                              const a = parseInt(aRaw, 10)
+                              const b = parseInt(bRaw, 10)
+                              if (!Number.isNaN(a) && !Number.isNaN(b)) {
+                                const start = Math.min(a, b)
+                                const end = Math.max(a, b)
+                                // cap range size to avoid accidental massive loops
+                                const cap = 500
+                                const len = Math.min(cap, end - start + 1)
+                                for (let v = start, i = 0; v <= end && i < len; v++, i++) targets.add(v)
+                              }
+                            } else {
+                              const val = parseInt(p, 10)
+                              if (!Number.isNaN(val)) targets.add(val)
+                            }
+                          }
+                          if (targets.size === 0) return false
+                          // Also support exact match against padded display form (e.g. '001')
+                          const tokenStrs = new Set(parts.map(p => p.replace(/^0+/, '') ? p : p))
+                          return b.tickets.some((n) => {
+                            const num = Number(n)
+                            if (targets.has(num)) return true
+                            const padded = String(n).padStart(3, '0')
+                            if (tokenStrs.has(padded)) return true
+                            return false
+                          })
                         })
                         .map((b, idx) => (
                         <div key={idx} className="p-3 rounded-xl bg-[#0b0b0b] border border-[#222] flex flex-col sm:flex-row justify-between gap-3">
