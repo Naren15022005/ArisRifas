@@ -227,10 +227,10 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
         <div className="absolute left-3 top-3 px-3 py-1 rounded-full bg-[#111] border border-white/10 text-xs text-white">{(raffle as any).publishedText || 'Publicado'}</div>
       )}
       {/* ── Image + Info row ── */}
-      <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 items-stretch h-full">
+      <div className="flex-1 flex flex-row sm:grid sm:grid-cols-2 items-stretch h-full">
 
         {/* Info column */}
-        <div className="order-2 sm:order-1 p-4 pt-10 pb-10 flex flex-col gap-4 h-full justify-between">
+        <div className="order-2 sm:order-1 p-3 sm:p-4 pt-6 pb-6 flex flex-col gap-3 h-full justify-between">
 
           {/* Title & description (header + meta) */}
           <div className="flex items-start justify-between gap-3">
@@ -299,12 +299,12 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
         </div>
 
         {/* Image column */}
-        <div className="order-1 sm:order-2 relative overflow-hidden h-40 sm:h-full" style={IMAGE_BG_STYLE}>
+        <div className="order-1 sm:order-2 relative overflow-hidden w-24 h-24 sm:h-full sm:w-auto flex-shrink-0 m-3 sm:m-0 rounded-xl" style={IMAGE_BG_STYLE}>
           <img
             loading="lazy"
             src={resolveImageSrc(raffle.image, raffle.imageUrl)}
             alt={raffle.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover rounded-lg"
             onError={(e)=>{(e.currentTarget as HTMLImageElement).src='/images/placeholder.svg'}}
           />
           {/* Subtle gradient overlay at bottom of image */}
