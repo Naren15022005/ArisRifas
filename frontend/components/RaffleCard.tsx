@@ -140,14 +140,17 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
 
   if (variant === 'vertical') {
     const content = (
-      <article className="h-full flex flex-col rounded-2xl overflow-hidden" style={CARD_STYLE}>
+      <article className="h-full flex flex-col rounded-2xl overflow-hidden relative" style={CARD_STYLE}>
+        {((raffle as any).published || (raffle as any).status === 'published' || (raffle as any).publishedAt) && (
+          <div className="absolute left-3 top-3 px-3 py-1 rounded-full bg-[#111] border border-white/10 text-xs text-white">{(raffle as any).publishedText || 'Publicado'}</div>
+        )}
         {/* Image on top */}
         <div className="relative w-full h-40 sm:h-56 bg-[#111] overflow-hidden">
           <img loading="lazy" src={resolveImageSrc(raffle.image, raffle.imageUrl)} alt={raffle.title} className="w-full h-full object-cover" onError={(e)=>{(e.currentTarget as HTMLImageElement).src='/images/placeholder.svg'}} />
         </div>
 
         {/* Content below */}
-        <div className="flex-1 p-6 flex flex-col justify-between">
+        <div className="flex-1 p-6 pt-10 pb-10 flex flex-col justify-between">
           <div>
             <h3 className="font-extrabold text-2xl lg:text-3xl text-white leading-tight">{raffle.title}</h3>
             {displayShort && <p className="text-sm text-gray-500 mt-1.5 leading-relaxed">{displayShort}</p>}
@@ -206,6 +209,11 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
             ) }
           </div>
         </div>
+        {raffle.endsAt && (
+          <div className="absolute right-3 bottom-3 px-3 py-1 rounded-full bg-[#0b0b0b] border border-white/5 text-xs text-gray-300">
+            {new Date(Number(raffle.endsAt)).toLocaleString()}
+          </div>
+        )}
       </article>
     )
 
@@ -214,12 +222,15 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
 
   // default horizontal layout (existing)
   const content = (
-    <article className="h-full flex flex-col rounded-2xl overflow-hidden" style={CARD_STYLE}>
+    <article className="h-full flex flex-col rounded-2xl overflow-hidden relative" style={CARD_STYLE}>
+      {((raffle as any).published || (raffle as any).status === 'published' || (raffle as any).publishedAt) && (
+        <div className="absolute left-3 top-3 px-3 py-1 rounded-full bg-[#111] border border-white/10 text-xs text-white">{(raffle as any).publishedText || 'Publicado'}</div>
+      )}
       {/* ── Image + Info row ── */}
       <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 items-stretch h-full">
 
         {/* Info column */}
-        <div className="order-2 sm:order-1 p-4 flex flex-col gap-4 h-full justify-between">
+        <div className="order-2 sm:order-1 p-4 pt-10 pb-10 flex flex-col gap-4 h-full justify-between">
 
           {/* Title & description (header + meta) */}
           <div className="flex items-start justify-between gap-3">
@@ -227,11 +238,6 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
               <h3 className="font-extrabold text-xl sm:text-2xl lg:text-3xl text-white leading-tight max-h-[4.5rem] overflow-hidden">{raffle.title}</h3>
               {displayShort && (
                 <p className="text-sm text-gray-500 mt-1.5 leading-relaxed">{displayShort}</p>
-              )}
-            </div>
-            <div className="flex-shrink-0 text-right ml-3">
-              {raffle.endsAt && (
-                <div className="text-xs text-gray-400">{new Date(Number(raffle.endsAt)).toLocaleDateString()}</div>
               )}
             </div>
           </div>
@@ -305,6 +311,12 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
           <div className="absolute inset-x-0 bottom-0 h-16" style={{ background: 'linear-gradient(to top, #0d0d0d, transparent)' }} />
         </div>
       </div>
+
+      {raffle.endsAt && (
+        <div className="absolute right-3 bottom-3 px-3 py-1 rounded-full bg-[#0b0b0b] border border-white/5 text-xs text-gray-300">
+          {new Date(Number(raffle.endsAt)).toLocaleString()}
+        </div>
+      )}
 
       {/* ── Countdown footer ── */}
       <div className="flex items-center justify-between px-6 py-2" style={FOOTER_STYLE}>
