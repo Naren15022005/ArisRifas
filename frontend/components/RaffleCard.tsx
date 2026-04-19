@@ -219,16 +219,21 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
       <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 items-stretch h-full">
 
         {/* Info column */}
-        <div className="order-2 sm:order-1 p-6 flex flex-col gap-5 h-full justify-between">
+        <div className="order-2 sm:order-1 p-4 flex flex-col gap-4 h-full justify-between">
 
-          {/* Title & description */}
-          <div>
-            <h3 className="font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white leading-tight">{raffle.title}</h3>
-            {displayShort && (
-              <p className="text-sm text-gray-500 mt-1.5 leading-relaxed">{displayShort}</p>
-            )}
-
-            
+          {/* Title & description (header + meta) */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1">
+              <h3 className="font-extrabold text-xl sm:text-2xl lg:text-3xl text-white leading-tight max-h-[4.5rem] overflow-hidden">{raffle.title}</h3>
+              {displayShort && (
+                <p className="text-sm text-gray-500 mt-1.5 leading-relaxed">{displayShort}</p>
+              )}
+            </div>
+            <div className="flex-shrink-0 text-right ml-3">
+              {raffle.endsAt && (
+                <div className="text-xs text-gray-400">{new Date(Number(raffle.endsAt)).toLocaleDateString()}</div>
+              )}
+            </div>
           </div>
 
           <div className="relative">
@@ -267,11 +272,11 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
           )}
 
           {/* CTA buttons */}
-          <div className="flex gap-3 flex-col sm:flex-row">
+          <div className="flex gap-3 flex-col sm:flex-row items-center justify-center">
             <button
               type="button"
               aria-label={`Comprar ${raffle.title}`}
-              className="flex-1 py-2.5 rounded-sm text-sm font-bold text-white transition-opacity hover:opacity-90 flex items-center justify-center"
+              className="flex-1 py-2 rounded-sm text-sm font-bold text-white transition-opacity hover:opacity-90 flex items-center justify-center max-w-xs"
               style={CTA_PRIMARY_STYLE}
             >
               Comprar
@@ -279,7 +284,7 @@ function RaffleCard({ raffle, variant = 'horizontal' }: Props) {
             <button
               type="button"
               aria-label={`Detalles ${raffle.title}`}
-              className="flex-1 py-2.5 rounded-sm text-sm font-semibold text-gray-400 hover:text-white transition-colors flex items-center justify-center"
+              className="flex-1 py-2 rounded-sm text-sm font-semibold text-gray-400 hover:text-white transition-colors flex items-center justify-center max-w-xs"
               style={CTA_SECONDARY_STYLE}
             >
               Detalles
