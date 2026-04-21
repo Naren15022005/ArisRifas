@@ -40,6 +40,7 @@ export default function AdminRaffleModal({ raffle, onClose, onSave, onDelete }: 
     normalizeImage(raffle.image || (raffle as any).imageUrl),
   )
   const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imageRemoved, setImageRemoved] = useState(false)
   const [saving, setSaving] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const fileRef = useRef<HTMLInputElement | null>(null)
@@ -48,6 +49,7 @@ export default function AdminRaffleModal({ raffle, onClose, onSave, onDelete }: 
     const f = e.target.files && e.target.files[0]
     if (f) {
       setImageFile(f)
+      setImageRemoved(false)
       setImagePreview(URL.createObjectURL(f))
     }
   }
@@ -68,13 +70,17 @@ export default function AdminRaffleModal({ raffle, onClose, onSave, onDelete }: 
     try {
       // Crear rifa nueva si aún no tiene id
       if (!id) {
+        const createBody: any = { ...payload }
+        if (imagePreview) createBody.imageUrl = imagePreview
+        else if (imageRemoved) createBody.imageUrl = null
+
         const resCreate = await fetch(`${base}/api/raffles`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-          body: JSON.stringify({ ...payload, imageUrl: imagePreview }),
+          body: JSON.stringify(createBody),
         })
         if (!resCreate.ok) throw new Error(await resCreate.text())
         const bodyCreate = await resCreate.json()
@@ -115,13 +121,16 @@ export default function AdminRaffleModal({ raffle, onClose, onSave, onDelete }: 
       }
 
       // Actualizar solo datos
+      const updatePayload: any = { ...payload }
+      if (imageRemoved) updatePayload.imageUrl = null
+
       const res = await fetch(`${base}/api/raffles/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(updatePayload),
       })
       if (!res.ok) throw new Error(await res.text())
       const body = await res.json()
@@ -195,6 +204,7 @@ export default function AdminRaffleModal({ raffle, onClose, onSave, onDelete }: 
                   onClick={() => {
                     setImageFile(null)
                     setImagePreview(undefined)
+                    setImageRemoved(true)
                   }}
                   className="px-3 py-1.5 rounded-lg bg-gray-800 text-xs font-semibold text-gray-100 border border-gray-700 hover:bg-gray-700"
                 >
